@@ -312,20 +312,22 @@ export default function AmbulanceDashboard() {
   ];
 
   return (
-    <div className="min-h-screen relative overflow-x-hidden"
-      style={{ background: 'linear-gradient(135deg, #070b14 0%, #0d1a2e 40%, #0b1520 70%, #070b14 100%)' }}>
+    <div className="min-h-screen relative overflow-x-hidden" style={{ background: 'var(--gradient-hero)' }}>
 
-      {/* Animated background orbs */}
+      {/* Animated background orbs matching login page */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-10%] left-[-5%] w-96 h-96 rounded-full opacity-10"
-          style={{ background: 'radial-gradient(circle, #ef4444, transparent)', filter: 'blur(60px)', animation: 'pulse 4s ease-in-out infinite' }} />
-        <div className="absolute bottom-[-10%] right-[-5%] w-80 h-80 rounded-full opacity-8"
-          style={{ background: 'radial-gradient(circle, #3b82f6, transparent)', filter: 'blur(80px)', animation: 'pulse 6s ease-in-out infinite alternate' }} />
+        <div className="absolute top-[-10%] left-[-5%] w-96 h-96 rounded-full bg-primary/8 blur-[100px] animate-pulse" />
+        <div className="absolute bottom-[-10%] right-[-5%] w-80 h-80 rounded-full bg-accent/8 blur-[100px] animate-pulse" style={{ animationDelay: '1.5s' }} />
         {hasActiveEmergency && (
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-5"
-            style={{ background: 'radial-gradient(circle, #ef4444, transparent)', filter: 'blur(100px)', animation: 'pulse 2s ease-in-out infinite' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-emergency/5 blur-[100px] animate-pulse" style={{ animationDuration: '2s' }} />
         )}
       </div>
+
+      {/* Grid overlay */}
+      <div className="fixed inset-0 opacity-[0.04] pointer-events-none" style={{
+        backgroundImage: 'linear-gradient(hsl(185 100% 50% / 1) 1px, transparent 1px), linear-gradient(90deg, hsl(185 100% 50% / 1) 1px, transparent 1px)',
+        backgroundSize: '50px 50px'
+      }} />
 
       {/* Emergency Broadcast Alert */}
       {showBroadcast && emergencyBroadcast && (
@@ -336,17 +338,17 @@ export default function AmbulanceDashboard() {
       )}
 
       {/* Premium Navbar */}
-      <nav className="relative z-20 sticky top-0"
+      <nav className="relative z-20 sticky top-0 border-b border-border/30"
         style={{
           background: hasActiveEmergency
-            ? 'rgba(127,29,29,0.25)'
-            : 'rgba(13,21,37,0.75)',
+            ? 'hsl(var(--emergency) / 0.12)'
+            : 'hsl(var(--card) / 0.65)',
           backdropFilter: 'blur(24px)',
-          borderBottom: hasActiveEmergency
-            ? '1px solid rgba(239,68,68,0.4)'
-            : '1px solid rgba(255,255,255,0.07)',
+          borderBottomColor: hasActiveEmergency
+            ? 'hsl(var(--emergency) / 0.35)'
+            : undefined,
           boxShadow: hasActiveEmergency
-            ? '0 0 30px rgba(239,68,68,0.15)'
+            ? '0 0 30px hsl(var(--emergency) / 0.15)'
             : '0 4px 24px rgba(0,0,0,0.4)'
         }}>
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">

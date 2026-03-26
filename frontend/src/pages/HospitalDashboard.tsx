@@ -164,20 +164,35 @@ export default function HospitalDashboard() {
 
   if (authLoading || ambLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="relative w-16 h-16 mx-auto">
+            <div className="absolute inset-0 rounded-full border-4 border-red-500/20 border-t-red-500 animate-spin" />
+            <div className="absolute inset-3 flex items-center justify-center">
+              <Building2 className="w-6 h-6 text-red-400 animate-pulse" />
+            </div>
+          </div>
+          <p className="text-slate-400 text-sm animate-pulse">Loading Hospital Dashboard...</p>
+        </div>
       </div>
     );
   }
 
   if (isLocked) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <Lock className="w-16 h-16 text-red-500 mx-auto" />
-          <h1 className="text-2xl font-bold">Dashboard Locked</h1>
-          <p className="text-muted-foreground">This dashboard has been locked by an administrator.</p>
-          <Button onClick={signOut}>Sign Out</Button>
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="text-center space-y-6 p-8 rounded-2xl border border-red-500/20 bg-red-500/5 max-w-sm w-full mx-4">
+          <div className="relative w-20 h-20 mx-auto">
+            <div className="absolute inset-0 rounded-full bg-red-500/10 animate-ping" />
+            <div className="relative w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center border border-red-500/30">
+              <Lock className="w-8 h-8 text-red-400" />
+            </div>
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-white">Dashboard Locked</h1>
+            <p className="text-slate-400 mt-2 text-sm">Locked by an administrator.</p>
+          </div>
+          <Button onClick={signOut} className="bg-red-600 hover:bg-red-700 text-white w-full">Sign Out</Button>
         </div>
       </div>
     );
@@ -1034,315 +1049,288 @@ export default function HospitalDashboard() {
           <div className="space-y-6">
             {/* KPI Metrics Row */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Card className="bg-slate-900/80 border-slate-700 rounded-xl backdrop-blur-sm shadow-lg shadow-red-500/10">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-slate-400 text-sm font-medium">Active Requests</p>
-                      <p className="text-3xl font-bold text-white">{pendingTokens.length + activeTokens.length}</p>
-                      <p className="text-xs text-slate-500 mt-1">{pendingTokens.length} pending</p>
+              {/* Active Requests */}
+              <div className="relative rounded-2xl p-px bg-gradient-to-br from-red-500/40 to-transparent">
+                <div className="rounded-2xl bg-slate-900/90 backdrop-blur-sm p-4 h-full shadow-lg shadow-red-500/10 hover:shadow-red-500/20 transition-shadow">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="w-10 h-10 rounded-xl bg-red-500/15 border border-red-500/20 flex items-center justify-center">
+                      <AlertTriangle className="w-5 h-5 text-red-400" />
                     </div>
-                    <div className="w-10 h-10 bg-red-500/20 rounded-full flex items-center justify-center">
-                      <AlertTriangle className="w-5 h-5 text-red-500" />
-                    </div>
+                    {pendingTokens.length > 0 && <span className="flex items-center gap-1 text-xs text-red-400 font-medium"><span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-ping" />URGENT</span>}
                   </div>
-                </CardContent>
-              </Card>
-              <Card className="bg-slate-900/80 border-slate-700 rounded-xl backdrop-blur-sm shadow-lg shadow-green-500/10">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-slate-400 text-sm font-medium">Available Ambulances</p>
-                      <p className="text-3xl font-bold text-white">{ambulances.filter(a => a.emergency_status === 'inactive').length}</p>
-                      <p className="text-xs text-slate-500 mt-1">{ambulances.length} total fleet</p>
+                  <p className="text-3xl font-bold text-white tabular-nums">{pendingTokens.length + activeTokens.length}</p>
+                  <p className="text-slate-400 text-xs font-medium mt-0.5">Active Requests</p>
+                  <p className="text-xs text-red-400/80 mt-1">{pendingTokens.length} pending review</p>
+                </div>
+              </div>
+              {/* Available Ambulances */}
+              <div className="relative rounded-2xl p-px bg-gradient-to-br from-emerald-500/40 to-transparent">
+                <div className="rounded-2xl bg-slate-900/90 backdrop-blur-sm p-4 h-full shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 transition-shadow">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/20 flex items-center justify-center">
+                      <Ambulance className="w-5 h-5 text-emerald-400" />
                     </div>
-                    <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
-                      <Ambulance className="w-5 h-5 text-green-500" />
-                    </div>
+                    <span className="text-xs text-emerald-400 font-medium">▲ READY</span>
                   </div>
-                </CardContent>
-              </Card>
-              <Card className="bg-slate-900/80 border-slate-700 rounded-xl backdrop-blur-sm shadow-lg shadow-blue-500/10">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-slate-400 text-sm font-medium">Partner Hospitals</p>
-                      <p className="text-3xl font-bold text-white">{hospitals.length}</p>
-                      <p className="text-xs text-slate-500 mt-1">{hospitals.length} in network</p>
+                  <p className="text-3xl font-bold text-white tabular-nums">{ambulances.filter(a => a.emergency_status === 'inactive').length}</p>
+                  <p className="text-slate-400 text-xs font-medium mt-0.5">Available Ambulances</p>
+                  <p className="text-xs text-slate-500 mt-1">{ambulances.length} total in fleet</p>
+                </div>
+              </div>
+              {/* Partner Hospitals */}
+              <div className="relative rounded-2xl p-px bg-gradient-to-br from-blue-500/40 to-transparent">
+                <div className="rounded-2xl bg-slate-900/90 backdrop-blur-sm p-4 h-full shadow-lg shadow-blue-500/10 hover:shadow-blue-500/20 transition-shadow">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/20 flex items-center justify-center">
+                      <Building2 className="w-5 h-5 text-blue-400" />
                     </div>
-                    <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
-                      <Building2 className="w-5 h-5 text-blue-500" />
-                    </div>
+                    <span className="text-xs text-blue-400 font-medium">NETWORK</span>
                   </div>
-                </CardContent>
-              </Card>
-              <Card className="bg-slate-900/80 border-slate-700 rounded-xl backdrop-blur-sm shadow-lg shadow-orange-500/10">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-slate-400 text-sm font-medium">Response Time</p>
-                      <p className="text-3xl font-bold text-white">4.2 min</p>
-                      <p className="text-xs text-slate-500 mt-1">12% improvement</p>
+                  <p className="text-3xl font-bold text-white tabular-nums">{hospitals.length}</p>
+                  <p className="text-slate-400 text-xs font-medium mt-0.5">Partner Hospitals</p>
+                  <p className="text-xs text-slate-500 mt-1">{networkStats.availableBeds} beds available</p>
+                </div>
+              </div>
+              {/* Avg Response Time */}
+              <div className="relative rounded-2xl p-px bg-gradient-to-br from-amber-500/40 to-transparent">
+                <div className="rounded-2xl bg-slate-900/90 backdrop-blur-sm p-4 h-full shadow-lg shadow-amber-500/10 hover:shadow-amber-500/20 transition-shadow">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/20 flex items-center justify-center">
+                      <Clock className="w-5 h-5 text-amber-400" />
                     </div>
-                    <div className="w-10 h-10 bg-orange-500/20 rounded-full flex items-center justify-center">
-                      <Clock className="w-5 h-5 text-orange-500" />
-                    </div>
+                    <span className="text-xs text-emerald-400 font-medium">▲ 12%</span>
                   </div>
-                </CardContent>
-              </Card>
+                  <p className="text-3xl font-bold text-white tabular-nums">4.2<span className="text-lg text-slate-400"> min</span></p>
+                  <p className="text-slate-400 text-xs font-medium mt-0.5">Avg Response Time</p>
+                  <p className="text-xs text-slate-500 mt-1">vs last 24h</p>
+                </div>
+              </div>
             </div>
 
             {/* Main Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              {/* Active Emergency Requests - Large Central Card */}
+              {/* Active Emergency Requests */}
               <div className="lg:col-span-3">
-                <Card className="bg-slate-900/80 border-slate-700 rounded-xl backdrop-blur-sm shadow-lg">
-                  <CardHeader className="bg-red-600 text-white rounded-t-xl">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <AlertTriangle className="w-6 h-6" />
-                        <CardTitle className="text-xl">Active Emergency Requests</CardTitle>
+                <div className="rounded-2xl overflow-hidden border border-slate-700/50 bg-slate-900/80 backdrop-blur-sm shadow-xl">
+                  <div className="bg-gradient-to-r from-red-700 to-red-600 px-5 py-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+                        <AlertTriangle className="w-4 h-4 text-white" />
                       </div>
-                      <RefreshCw className="w-5 h-5 cursor-pointer hover:rotate-180 transition-transform" onClick={() => window.location.reload()} />
+                      <div>
+                        <h3 className="font-bold text-white text-base">Active Emergency Requests</h3>
+                        <p className="text-red-200 text-xs">{[...pendingTokens, ...activeTokens].length} active</p>
+                      </div>
                     </div>
-                  </CardHeader>
-                  <CardContent className="p-6 space-y-4">
+                    <button onClick={() => window.location.reload()} className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors">
+                      <RefreshCw className="w-4 h-4 text-white" />
+                    </button>
+                  </div>
+                  <div className="p-4 space-y-3">
                     {[...pendingTokens, ...activeTokens].length === 0 ? (
-                      <div className="text-center py-8 text-slate-400">
-                        No active emergency requests
+                      <div className="text-center py-10">
+                        <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center mx-auto mb-3">
+                          <AlertTriangle className="w-6 h-6 text-slate-600" />
+                        </div>
+                        <p className="text-slate-500 text-sm">No active emergency requests</p>
                       </div>
                     ) : (
                       [...pendingTokens, ...activeTokens].map((token) => {
                         const ambulance = ambulances.find(a => a.id === token.ambulance_id);
                         const isPending = token.status === 'pending';
                         const isCritical = token.status === 'in_progress' || token.status === 'to_hospital';
-                        
+                        const elapsed = Math.floor((Date.now() - new Date(token.created_at).getTime()) / 60000);
                         return (
-                          <div key={token.id} className="flex items-center justify-between p-4 bg-slate-800/50 rounded-lg border border-slate-700">
-                            <div className="flex items-center gap-4">
-                              <div className="flex gap-2">
-                                <Badge className={isCritical ? "bg-red-800 text-white animate-pulse" : "bg-red-600 text-white"}>
-                                  {isCritical ? 'CRITICAL' : 'HIGH'}
-                                </Badge>
-                                <Badge className={`${isPending ? 'bg-orange-600' : token.status === 'in_progress' ? 'bg-blue-600' : 'bg-green-600'} text-white`}>
-                                  {token.status.replace('_', ' ').toUpperCase()}
-                                </Badge>
-                              </div>
+                          <div key={token.id} className={`flex items-center justify-between p-4 rounded-xl border transition-all hover:scale-[1.01] ${
+                            isCritical ? 'bg-red-500/5 border-red-500/20' : isPending ? 'bg-amber-500/5 border-amber-500/20' : 'bg-slate-800/60 border-slate-700/50'
+                          }`}>
+                            <div className="flex items-center gap-3">
+                              <div className={`w-1 h-12 rounded-full flex-shrink-0 ${
+                                isCritical ? 'bg-red-500' : isPending ? 'bg-amber-500' : 'bg-blue-500'
+                              }`} />
                               <div>
-                                <p className="font-semibold text-white">{token.token_code}</p>
-                                <p className="text-sm text-slate-400">{token.pickup_address || `${token.pickup_lat.toFixed(4)}, ${token.pickup_lng.toFixed(4)}`}</p>
-                                <p className="text-xs text-slate-500">{ambulance?.vehicle_number || 'Unknown ambulance'}</p>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="font-bold text-white text-sm font-mono">{token.token_code}</span>
+                                  <Badge className={`text-[10px] px-1.5 py-0 ${isCritical ? 'bg-red-600/80 text-white' : isPending ? 'bg-amber-600/80 text-white' : 'bg-blue-600/80 text-white'}`}>
+                                    {token.status.replace(/_/g, ' ').toUpperCase()}
+                                  </Badge>
+                                  {isCritical && <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />}
+                                </div>
+                                <p className="text-slate-400 text-xs">{token.pickup_address || `${token.pickup_lat.toFixed(4)}, ${token.pickup_lng.toFixed(4)}`}</p>
+                                <p className="text-slate-600 text-xs mt-0.5">{ambulance?.vehicle_number || 'Unknown'} · {elapsed}m ago</p>
                               </div>
                             </div>
-                            <div className="flex items-center gap-4">
-                              <span className="text-sm text-slate-400">{new Date(token.created_at).toLocaleTimeString()}</span>
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                className="border-slate-600 text-slate-300"
-                                onClick={() => setActiveNav('tokens')}
-                              >
-                                <Eye className="w-4 h-4 mr-1" />
-                                View Details
-                              </Button>
-                            </div>
+                            <Button size="sm" variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700 rounded-lg text-xs" onClick={() => setActiveNav('tokens')}>
+                              <Eye className="w-3 h-3 mr-1" />Details
+                            </Button>
                           </div>
                         );
                       })
                     )}
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </div>
 
-              {/* Recent Activity Panel */}
+              {/* Recent Activity Timeline */}
               <div className="lg:col-span-1">
-                <Card className="bg-slate-900/80 border-slate-700 rounded-xl backdrop-blur-sm shadow-lg">
-                  <CardHeader className="bg-green-600 text-white rounded-t-xl">
-                    <CardTitle className="text-lg">Recent Activity</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-4 space-y-3">
-                    {[...pendingTokens, ...assignedTokens, ...activeTokens].slice(0, 5).map((token) => {
-                      const ambulance = ambulances.find(a => a.id === token.ambulance_id);
+                <div className="rounded-2xl overflow-hidden border border-slate-700/50 bg-slate-900/80 backdrop-blur-sm shadow-xl h-full">
+                  <div className="bg-gradient-to-r from-emerald-700 to-emerald-600 px-5 py-4">
+                    <h3 className="font-bold text-white text-base">Recent Activity</h3>
+                    <p className="text-emerald-200 text-xs">Latest token events</p>
+                  </div>
+                  <div className="p-4 space-y-1">
+                    {[...pendingTokens, ...assignedTokens, ...activeTokens].slice(0, 6).map((token, idx, arr) => {
                       const isCritical = token.status === 'in_progress' || token.status === 'to_hospital';
-                      
+                      const isNew = Date.now() - new Date(token.created_at).getTime() < 60000;
+                      const dotColor = token.status === 'completed' ? 'bg-emerald-500' : token.status === 'cancelled' ? 'bg-red-500' : isCritical ? 'bg-blue-500' : 'bg-amber-500';
+                      const textColor = token.status === 'completed' ? 'text-emerald-400' : token.status === 'cancelled' ? 'text-red-400' : isCritical ? 'text-blue-400' : 'text-amber-400';
                       return (
-                        <div key={token.id} className="p-3 bg-slate-800/50 rounded-lg border border-slate-700">
-                          <div className="flex items-center gap-2">
-                            <p className="font-medium text-white text-sm">{token.token_code}</p>
-                            {isCritical && <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>}
+                        <div key={token.id} className="flex gap-3 py-2">
+                          <div className="flex flex-col items-center">
+                            <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1 ${dotColor} ${isCritical ? 'animate-pulse' : ''}`} />
+                            {idx < arr.length - 1 && <div className="w-px flex-1 bg-slate-700/50 mt-1" />}
                           </div>
-                          <p className={`text-xs ${
-                            token.status === 'completed' ? 'text-green-400' :
-                            token.status === 'cancelled' ? 'text-red-400' :
-                            token.status === 'in_progress' || token.status === 'to_hospital' ? 'text-blue-400' :
-                            'text-orange-400'
-                          }`}>
-                            {token.status.replace('_', ' ')}
-                          </p>
-                          <p className="text-xs text-slate-500">{token.pickup_address?.split(',')[0] || 'Unknown location'}</p>
-                          <p className="text-xs text-slate-600">{new Date(token.created_at).toLocaleTimeString()}</p>
+                          <div className="pb-2">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-white text-xs font-mono font-bold">{token.token_code}</span>
+                              {isNew && <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-1 rounded">NEW</span>}
+                            </div>
+                            <p className={`text-xs ${textColor}`}>{token.status.replace(/_/g, ' ')}</p>
+                            <p className="text-slate-600 text-[10px]">{new Date(token.created_at).toLocaleTimeString()}</p>
+                          </div>
                         </div>
                       );
                     })}
-                  </CardContent>
-                </Card>
+                    {[...pendingTokens, ...assignedTokens, ...activeTokens].length === 0 && (
+                      <p className="text-slate-500 text-xs text-center py-6">No recent activity</p>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Ambulance Fleet Status - No Gap */}
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 -mt-6">
+            {/* Ambulance Fleet Status */}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
               <div className="lg:col-span-3">
-                <Card className="bg-slate-900/80 border-slate-700 rounded-xl backdrop-blur-sm shadow-lg">
-                  <CardHeader className="bg-blue-600 text-white rounded-t-xl">
-                    <div className="flex items-center gap-3">
-                      <Ambulance className="w-6 h-6" />
-                      <CardTitle className="text-xl">Ambulance Fleet Status</CardTitle>
+                <div className="rounded-2xl overflow-hidden border border-slate-700/50 bg-slate-900/80 backdrop-blur-sm shadow-xl">
+                  <div className="bg-gradient-to-r from-blue-700 to-blue-600 px-5 py-4 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
+                      <Ambulance className="w-4 h-4 text-white" />
                     </div>
-                  </CardHeader>
-                  <CardContent className="p-6 space-y-4">
+                    <div>
+                      <h3 className="font-bold text-white text-base">Ambulance Fleet Status</h3>
+                      <p className="text-blue-200 text-xs">{ambulances.length} units registered</p>
+                    </div>
+                  </div>
+                  <div className="p-4 space-y-3">
                     {ambulances.length === 0 ? (
-                      <div className="text-center py-8 text-slate-400">
-                        No ambulances in fleet
-                      </div>
+                      <div className="text-center py-8 text-slate-500 text-sm">No ambulances in fleet</div>
                     ) : (
                       ambulances.slice(0, 5).map((ambulance) => {
                         const activeToken = [...pendingTokens, ...assignedTokens, ...activeTokens].find(t => t.ambulance_id === ambulance.id);
                         const isOnDuty = ambulance.emergency_status === 'active' || ambulance.emergency_status === 'responding' || !!activeToken;
                         const fuelLevel = ambulance.vehicle_health?.fuel_percent ?? 75;
                         const batteryLevel = ambulance.vehicle_health?.battery_percent ?? 85;
-
                         return (
-                          <div key={ambulance.id} className="flex items-center justify-between p-4 bg-slate-800/50 rounded-lg border border-slate-700">
-                            <div className="flex items-center gap-4">
-                              <div className="flex gap-2">
-                                <Badge className={`${isOnDuty ? 'bg-blue-600' : 'bg-green-600'} text-white`}>
-                                  {isOnDuty ? 'DISPATCHED' : 'AVAILABLE'}
-                                </Badge>
-                                <Badge className="bg-green-600 text-white">
-                                  BASIC CARE
-                                </Badge>
-                              </div>
+                          <div key={ambulance.id} className="flex items-center justify-between p-4 rounded-xl bg-slate-800/60 border border-slate-700/40 hover:border-slate-600/60 transition-all hover:scale-[1.005]">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${isOnDuty ? 'bg-blue-400 animate-pulse' : 'bg-emerald-400'}`} />
                               <div>
-                                <p className="font-semibold text-white">{ambulance.vehicle_number}</p>
-                                <p className="text-sm text-slate-400">Driver: {ambulance.driver_id ? 'Assigned' : 'Unassigned'}</p>
-                                <p className="text-xs text-slate-500">
-                                  {ambulance.current_lat?.toFixed(4)}°N, {ambulance.current_lng?.toFixed(4)}°E
-                                </p>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-bold text-white text-sm">{ambulance.vehicle_number}</span>
+                                  <Badge className={`text-[10px] px-1.5 py-0 ${isOnDuty ? 'bg-blue-600/70 text-white' : 'bg-emerald-600/70 text-white'}`}>
+                                    {isOnDuty ? 'DISPATCHED' : 'AVAILABLE'}
+                                  </Badge>
+                                </div>
+                                <p className="text-slate-500 text-xs">{ambulance.current_lat?.toFixed(4)}°N, {ambulance.current_lng?.toFixed(4)}°E</p>
                               </div>
                             </div>
                             <div className="flex items-center gap-4">
-                              <div className="flex items-center gap-2">
-                                <div className="w-20 h-2 bg-slate-700 rounded-full overflow-hidden">
-                                  <div 
-                                    className={`h-full rounded-full ${
-                                      fuelLevel > 60 ? 'bg-blue-500' : 
-                                      fuelLevel > 30 ? 'bg-orange-500' : 'bg-red-500'
-                                    }`}
-                                    style={{ width: `${fuelLevel}%` }}
-                                  ></div>
+                              <div className="space-y-1.5">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-[10px] text-slate-500 w-5">⛽</span>
+                                  <div className="w-20 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                                    <div className={`h-full rounded-full transition-all ${fuelLevel > 60 ? 'bg-blue-400' : fuelLevel > 30 ? 'bg-amber-400' : 'bg-red-500'}`} style={{ width: `${fuelLevel}%` }} />
+                                  </div>
+                                  <span className="text-[10px] text-slate-400">{fuelLevel}%</span>
                                 </div>
-                                <span className="text-sm text-slate-400">⛽{fuelLevel}%</span>
-                              </div>
-                              {/* Add battery level indicator */}
-                              <div className="flex items-center gap-2">
-                                <div className="w-16 h-2 bg-slate-700 rounded-full overflow-hidden">
-                                  <div 
-                                    className={`h-full rounded-full ${
-                                      batteryLevel > 80 ? 'bg-green-500' : 
-                                      batteryLevel > 50 ? 'bg-yellow-500' : 'bg-red-500'
-                                    }`}
-                                    style={{ width: `${batteryLevel}%` }}
-                                  ></div>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-[10px] text-slate-500 w-5">🔋</span>
+                                  <div className="w-20 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                                    <div className={`h-full rounded-full transition-all ${batteryLevel > 80 ? 'bg-emerald-400' : batteryLevel > 50 ? 'bg-yellow-400' : 'bg-red-500'}`} style={{ width: `${batteryLevel}%` }} />
+                                  </div>
+                                  <span className="text-[10px] text-slate-400">{batteryLevel}%</span>
                                 </div>
-                                <span className="text-xs text-slate-400">🔋{batteryLevel}%</span>
                               </div>
-                              <div className={`w-3 h-3 rounded-full ${isOnDuty ? 'bg-blue-500 animate-pulse' : 'bg-green-500'}`}></div>
                             </div>
                           </div>
                         );
                       })
                     )}
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </div>
 
               {/* Quick Actions */}
               <div className="lg:col-span-1">
-                <Card className="bg-slate-900/80 border-slate-700 rounded-xl backdrop-blur-sm shadow-lg">
-                  <CardHeader>
-                    <CardTitle className="text-lg text-white">Quick Actions</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-4 space-y-3">
-                    <Button 
-                      className="w-full bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all"
-                      onClick={() => setActiveNav('create-emergency')}
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Create Emergency Request
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="w-full border-slate-600 text-slate-300 hover:bg-slate-800 rounded-lg"
-                      onClick={() => setActiveNav('livemap')}
-                    >
-                      <MapIcon className="w-4 h-4 mr-2" />
-                      View Live Map
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      className="w-full border-slate-600 text-slate-300 hover:bg-slate-800 rounded-lg"
-                      onClick={() => setActiveNav('ambulances')}
-                    >
-                      <Ambulance className="w-4 h-4 mr-2" />
-                      Manage Fleet
-                    </Button>
-                  </CardContent>
-                </Card>
+                <div className="rounded-2xl border border-slate-700/50 bg-slate-900/80 backdrop-blur-sm shadow-xl overflow-hidden">
+                  <div className="px-5 py-4 border-b border-slate-700/50">
+                    <h3 className="font-bold text-white text-base">Quick Actions</h3>
+                  </div>
+                  <div className="p-4 space-y-2.5">
+                    <button onClick={() => setActiveNav('create-emergency')} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white font-medium text-sm transition-all hover:scale-[1.02] hover:shadow-lg hover:shadow-red-500/20">
+                      <Plus className="w-4 h-4" /> Create Emergency
+                    </button>
+                    {pendingTokens.length > 0 && (
+                      <button onClick={() => setActiveNav('tokens')} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 font-medium text-sm transition-all hover:bg-amber-500/20 hover:scale-[1.02]">
+                        <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+                        Review {pendingTokens.length} Token{pendingTokens.length > 1 ? 's' : ''}
+                      </button>
+                    )}
+                    <button onClick={() => setActiveNav('livemap')} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800/80 border border-slate-700/50 text-slate-300 font-medium text-sm transition-all hover:bg-slate-700/80 hover:scale-[1.02]">
+                      <MapIcon className="w-4 h-4" /> View Live Map
+                    </button>
+                    <button onClick={() => setActiveNav('ambulances')} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800/80 border border-slate-700/50 text-slate-300 font-medium text-sm transition-all hover:bg-slate-700/80 hover:scale-[1.02]">
+                      <Ambulance className="w-4 h-4" /> Manage Fleet
+                    </button>
+                    <button onClick={() => setActiveNav('network')} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-800/80 border border-slate-700/50 text-slate-300 font-medium text-sm transition-all hover:bg-slate-700/80 hover:scale-[1.02]">
+                      <Activity className="w-4 h-4" /> Hospital Network
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Pending Tokens Alert */}
-            {pendingTokens.length > 0 && (
-              <Card className="border-emergency bg-emergency/10">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-emergency">
-                    <AlertTriangle className="w-5 h-5" />
-                    {pendingTokens.length} Pending Emergency Token{pendingTokens.length > 1 ? 's' : ''}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Button onClick={() => setActiveNav('tokens')} variant="emergency">
-                    Review Tokens
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
-
             {/* Active Journeys Overview */}
             {activeTokens.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Ambulance className="w-5 h-5" />
-                    Active Journeys
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {activeTokens.map(token => (
-                      <div key={token.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <Badge variant="outline" className="font-mono">{token.token_code}</Badge>
-                          <span className="text-sm">→ {token.hospital_name}</span>
+              <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Ambulance className="w-4 h-4 text-blue-400" />
+                  <h3 className="font-semibold text-white text-sm">Active Journeys</h3>
+                  <Badge className="bg-blue-500/20 text-blue-400 text-xs">{activeTokens.length}</Badge>
+                </div>
+                <div className="space-y-2">
+                  {activeTokens.map(token => {
+                    const step = token.status === 'route_selected' ? 0 : token.status === 'in_progress' ? 1 : token.status === 'at_patient' ? 2 : 3;
+                    const steps = ['Assigned', 'To Patient', 'At Patient', 'To Hospital'];
+                    return (
+                      <div key={token.id} className="flex items-center gap-4 p-3 rounded-xl bg-slate-800/50 border border-slate-700/40">
+                        <Badge variant="outline" className="font-mono text-xs border-blue-500/30 text-blue-300">{token.token_code}</Badge>
+                        <div className="flex-1 flex items-center gap-1">
+                          {steps.map((s, i) => (
+                            <div key={i} className="flex items-center gap-1 flex-1">
+                              <div className={`w-2 h-2 rounded-full flex-shrink-0 ${i <= step ? 'bg-blue-500' : 'bg-slate-600'}`} />
+                              <span className={`text-[10px] flex-1 ${i <= step ? 'text-blue-400' : 'text-slate-600'}`}>{s}</span>
+                              {i < steps.length - 1 && <div className={`h-px flex-1 ${i < step ? 'bg-blue-500' : 'bg-slate-700'}`} />}
+                            </div>
+                          ))}
                         </div>
-                        <Badge variant={token.status === 'at_patient' ? 'default' : 'destructive'}>
-                          {token.status.replace(/_/g, ' ')}
-                        </Badge>
+                        <span className="text-xs text-slate-500 flex-shrink-0">{token.hospital_name}</span>
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                    );
+                  })}
+                </div>
+              </div>
             )}
           </div>
         );
@@ -1350,23 +1338,24 @@ export default function HospitalDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col md:flex-row">
+    <div className="min-h-screen bg-slate-950 flex flex-col md:flex-row">
       {/* Emergency Broadcast Popup */}
       {showBroadcast && emergencyBroadcast && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 max-w-md w-full mx-4">
-          <div className="bg-red-600 border border-red-500 rounded-lg p-4 shadow-lg animate-pulse">
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 max-w-lg w-full px-4">
+          <div className="relative bg-gradient-to-r from-red-900/95 to-red-800/95 backdrop-blur-xl border border-red-500/40 rounded-2xl p-4 shadow-2xl shadow-red-900/50">
+            <div className="absolute inset-0 rounded-2xl bg-red-500/5 animate-pulse pointer-events-none" />
             <div className="flex items-start gap-3">
-              <Bell className="w-6 h-6 text-white flex-shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <h3 className="font-bold text-white text-sm">🚨 EMERGENCY BROADCAST</h3>
-                <p className="text-white text-sm mt-1">{emergencyBroadcast}</p>
+              <div className="w-9 h-9 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0 border border-red-500/30">
+                <Bell className="w-4 h-4 text-red-300 animate-pulse" />
               </div>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setShowBroadcast(false)}
-                className="text-white hover:bg-red-700 p-1 h-auto"
-              >
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-bold text-red-300 tracking-widest uppercase">Emergency Broadcast</span>
+                  <span className="w-2 h-2 rounded-full bg-red-400 animate-ping" />
+                </div>
+                <p className="text-white text-sm leading-relaxed">{emergencyBroadcast}</p>
+              </div>
+              <Button size="sm" variant="ghost" onClick={() => setShowBroadcast(false)} className="text-red-300 hover:bg-red-500/20 p-1 h-auto">
                 <X className="w-4 h-4" />
               </Button>
             </div>
@@ -1375,70 +1364,108 @@ export default function HospitalDashboard() {
       )}
 
       {/* Mobile Navigation */}
-      <div className="md:hidden border-b bg-card">
+      <div className="md:hidden bg-slate-950 border-b border-slate-800">
         <div className="p-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Building2 className="w-5 h-5 text-primary" />
-            <span className="font-bold text-sm">Hospital Control</span>
+            <div className="w-7 h-7 rounded-lg bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
+              <Building2 className="w-4 h-4 text-blue-400" />
+            </div>
+            <span className="font-bold text-white text-sm">Hospital Control</span>
           </div>
-          <Button variant="ghost" size="sm" onClick={signOut}>
+          <Button variant="ghost" size="sm" onClick={signOut} className="text-slate-400 hover:text-white">
             <LogOut className="w-4 h-4" />
           </Button>
         </div>
-        <div className="px-4 pb-4">
-          <div className="flex gap-1 overflow-x-auto">
-            {navItems.map(item => (
-              <button
-                key={item.id}
-                onClick={() => setActiveNav(item.id)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg whitespace-nowrap text-xs transition-colors ${
-                  activeNav === item.id ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
-                }`}
-              >
-                <item.icon className="w-4 h-4" />
-                <span className="hidden sm:inline">{item.label}</span>
-              </button>
-            ))}
-          </div>
+        <div className="px-4 pb-4 flex gap-1 overflow-x-auto">
+          {navItems.map(item => (
+            <button key={item.id} onClick={() => setActiveNav(item.id)}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl whitespace-nowrap text-xs font-medium transition-all flex-shrink-0 ${
+                activeNav === item.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              }`}>
+              <item.icon className="w-3.5 h-3.5" />
+              <span>{item.label}</span>
+            </button>
+          ))}
         </div>
       </div>
 
       {/* Desktop Sidebar */}
-      <aside className="w-64 border-r bg-card hidden md:block">
-        <div className="p-4 border-b">
-          <div className="flex items-center gap-2">
-            <Building2 className="w-6 h-6 text-primary" />
-            <span className="font-bold">Hospital Control</span>
+      <aside className="w-64 bg-slate-950/95 border-r border-slate-800/60 hidden md:flex flex-col shadow-2xl">
+        {/* Brand */}
+        <div className="p-5 border-b border-slate-800/60">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-500/30">
+              <Building2 className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <p className="font-bold text-white text-sm leading-tight">Hospital Control</p>
+              <p className="text-slate-500 text-[10px]">MediRoute AI</p>
+            </div>
           </div>
         </div>
-        <nav className="p-2">
+        {/* Navigation */}
+        <nav className="flex-1 p-3 space-y-1">
           {navItems.map(item => (
-            <button
-              key={item.id}
-              onClick={() => setActiveNav(item.id)}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                activeNav === item.id ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
-              }`}
-            >
-              <item.icon className="w-5 h-5" />
-              {item.label}
+            <button key={item.id} onClick={() => setActiveNav(item.id)}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-sm font-medium ${
+                activeNav === item.id
+                  ? 'bg-gradient-to-r from-blue-600/80 to-blue-500/60 text-white shadow-md shadow-blue-500/10 border border-blue-500/20'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/70'
+              }`}>
+              {activeNav === item.id && <div className="w-1 h-4 rounded-full bg-blue-400 flex-shrink-0" />}
+              <item.icon className="w-4 h-4 flex-shrink-0" />
+              <span className="flex-1 text-left">{item.label}</span>
+              {item.id === 'tokens' && pendingTokens.length > 0 && (
+                <span className="w-4 h-4 rounded-full bg-red-500 text-white text-[9px] flex items-center justify-center font-bold flex-shrink-0">{pendingTokens.length}</span>
+              )}
             </button>
           ))}
         </nav>
+        {/* User Info */}
+        <div className="p-4 border-t border-slate-800/60">
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-800/50">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center flex-shrink-0">
+              <span className="text-white text-xs font-bold">{(profile?.organization_name || 'H')[0].toUpperCase()}</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-white text-xs font-semibold truncate">{profile?.organization_name || 'Hospital'}</p>
+              <p className="text-slate-500 text-[10px] truncate">{user?.email}</p>
+            </div>
+            <button onClick={signOut} className="text-slate-500 hover:text-red-400 transition-colors flex-shrink-0">
+              <LogOut className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
       </aside>
 
       {/* Main */}
-      <main className="flex-1">
-        <header className="border-b px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
-          <h1 className="text-lg sm:text-xl font-bold truncate">{profile?.organization_name || 'Hospital Dashboard'}</h1>
-          <div className="flex items-center gap-2 sm:gap-4">
-            <span className="text-xs sm:text-sm text-muted-foreground hidden sm:block">{currentTime.toLocaleTimeString()}</span>
-            <Button variant="ghost" size="sm" onClick={signOut} className="hidden md:flex">
+      <main className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <header className="bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/60 px-5 py-3.5 flex justify-between items-center flex-shrink-0 shadow-sm">
+          <div>
+            <h1 className="text-white font-bold text-base leading-tight">{profile?.organization_name || 'Hospital Dashboard'}</h1>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-emerald-400 text-[10px] font-medium tracking-wider uppercase">Live</span>
+              <span className="text-slate-600 text-[10px]">·</span>
+              <span className="text-slate-500 text-[10px]">{currentTime.toLocaleTimeString()}</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            {pendingTokens.length > 0 && (
+              <button onClick={() => setActiveNav('tokens')} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-medium hover:bg-red-500/20 transition-colors">
+                <AlertTriangle className="w-3 h-3" />
+                {pendingTokens.length} Pending
+              </button>
+            )}
+            <Button variant="ghost" size="sm" onClick={signOut} className="hidden md:flex text-slate-400 hover:text-white">
               <LogOut className="w-4 h-4" />
             </Button>
           </div>
         </header>
-        <div className="p-3 sm:p-4 md:p-6">{renderContent()}</div>
+        <div className="flex-1 overflow-auto p-4 md:p-6 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+          {renderContent()}
+        </div>
       </main>
     </div>
   );
