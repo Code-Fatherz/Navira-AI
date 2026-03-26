@@ -1,11 +1,11 @@
-# 🚑 Navira AI – Smart Ambulance Navigation System
+# 🚑 MediRoute AI – Smart Ambulance Navigation System
 
 > ⏱ Every 1 minute of delay in emergency response reduces survival probability by **7-10%**.  
-> **Navira AI** minimizes delays by automating routing, traffic control, and hospital coordination in real time.
+> **MediRoute AI** minimizes delays by automating routing, traffic control, and hospital coordination in real time.
 
 ## 🧠 Overview
 
-**Navira AI** is a real-time, city-scale emergency mobility platform that coordinates:
+**MediRoute AI** is a real-time, city-scale emergency mobility platform that coordinates:
 
 - 🚑 **Ambulances**
 - 🏥 **Hospitals** 
@@ -303,7 +303,7 @@ MediBot Response:
 ## 📁 Project Structure
 
 ```
-Navira-AI/
+MediRoute-AI/
 ├── frontend/              # React + TypeScript + Vite
 │   ├── src/
 │   │   ├── components/    # Reusable UI components
@@ -428,4 +428,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Navira AI** - Saving lives through smart technology 🚑
+**MediRoute AI** - Saving lives through smart technology 🚑

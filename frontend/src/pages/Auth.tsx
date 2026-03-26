@@ -121,7 +121,7 @@ export default function Auth() {
         {/* Logo + heading */}
         <div className="text-center mb-8 flex flex-col items-center">
           <Logo size="lg" showText={false} className="!-mt-0 mb-4 [&_img]:!w-36 [&_img]:!h-36" />
-          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">Navira AI</h1>
+          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">MediRoute AI</h1>
           <p className="text-muted-foreground mt-1 text-sm">Smart Ambulance Navigation System</p>
         </div>
 

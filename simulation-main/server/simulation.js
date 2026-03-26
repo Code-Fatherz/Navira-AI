@@ -1,5 +1,5 @@
 // ============================================================
-// Navira AI - Simulation Engine v2.1
+// Mediroute AI - Simulation Engine v2.1
 // Chandigarh City Map, 10 Ambulances, 8 Hospitals
 // 4-way Traffic Lights at Actual Intersections
 // Colored Road Segments reflecting traffic density
@@ -54,14 +54,14 @@ const MAJOR_ROADS = [
 const ROAD_SEGMENTS = [];
 MAJOR_ROADS.forEach(road => {
   for (let i = 0; i < road.points.length - 1; i++) {
-     ROAD_SEGMENTS.push({
-       id: `${road.id}-${i}`,
-       name: road.name,
-       start: { lat: road.points[i][0], lng: road.points[i][1] },
-       end: { lat: road.points[i+1][0], lng: road.points[i+1][1] },
-       coords: null, // Will be fetched via OSRM on init
-       vehicles: 35,
-     });
+    ROAD_SEGMENTS.push({
+      id: `${road.id}-${i}`,
+      name: road.name,
+      start: { lat: road.points[i][0], lng: road.points[i][1] },
+      end: { lat: road.points[i + 1][0], lng: road.points[i + 1][1] },
+      coords: null, // Will be fetched via OSRM on init
+      vehicles: 35,
+    });
   }
 });
 
@@ -171,11 +171,11 @@ class Simulation {
   async initRoads() {
     try {
       const graphData = await CityGraph.buildGraph();
-      
+
       // Keep legacy support for haversine via root map
-      this.signals = graphData.intersections.map(i => ({...i, lat: i.latitude, lng: i.longitude }));
+      this.signals = graphData.intersections.map(i => ({ ...i, lat: i.latitude, lng: i.longitude }));
       this.roadSegments = graphData.roadSegments;
-      
+
       // Initialize Phase Controller and AI Optimization Loop
       SignalController.init(this.signals);
       SignalController.start(this.broadcast.bind(this));
@@ -195,7 +195,7 @@ class Simulation {
 
   cycleSignals() {
     // Moved to signalController.js
-    
+
     // Fluctuate signal vehicles (intersections)
     this.signals.forEach(sig => {
       const delta = Math.floor(Math.random() * 5) - 2;
@@ -240,7 +240,7 @@ class Simulation {
     try {
       this.routeToPatientCoords = [];
       this.routeToHospitalCoords = [];
-      
+
       const ambOptions = await Promise.all(availableAmbs.map(async amb => {
         try { const r = await fetchRoute(amb, this.patient); return { ...amb, ...r }; }
         catch (e) { return null; }
@@ -269,7 +269,7 @@ class Simulation {
       this.activeAmbulanceId = bestAmb.id;
       this.activeHospitalId = nearestHosp.id;
       this.phase = 'to_patient';
-      
+
       this.currentRoute = this.routeToPatientCoords;
       this.routeIndex = 0;
       this.ambulancePosition = this.currentRoute[0];
@@ -316,7 +316,7 @@ class Simulation {
       } else if (this.phase === 'to_hospital') {
         this.phase = 'arrived';
         this.emergencyActive = false;
-        
+
         let ambRef = this.ambulances.find(a => a.id === this.activeAmbulanceId);
         if (ambRef && this.currentRoute.length > 0) {
           const last = this.currentRoute[this.currentRoute.length - 1];
@@ -333,8 +333,8 @@ class Simulation {
         CorridorEngine.reset();
 
         const totalNormalTime = this.routeToPatientDuration + this.routeToHospitalDuration;
-        const totalOptimizedTime = totalNormalTime * 0.55; 
-        
+        const totalOptimizedTime = totalNormalTime * 0.55;
+
         this.broadcast('metrics_update', {
           normalTime: totalNormalTime,
           optimizedTime: totalOptimizedTime,
@@ -402,7 +402,7 @@ class Simulation {
     this.greenCorridorSignals = [];
     this.startTime = null;
     this.patient = null;
-    
+
     // Ambulances stay at their newly updated positions if they finished an emergency! They just become available.
     this.ambulances.forEach(a => { a.available = true; });
 

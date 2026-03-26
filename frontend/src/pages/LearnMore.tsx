@@ -23,7 +23,7 @@ export default function LearnMore() {
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
       <header className="border-b border-border px-6 py-4 flex justify-between items-center">
-        <h1 className="text-xl font-bold text-cyan-400">Navira AI</h1>
+        <h1 className="text-xl font-bold text-cyan-400">Mediroute AI</h1>
         <Button
           className="bg-cyan-500 hover:bg-cyan-600 text-black"
           onClick={() => navigate("/")}
@@ -39,7 +39,7 @@ export default function LearnMore() {
           Smart Ambulance Navigation & Traffic Signal Priority
         </h2>
         <p className="text-muted-foreground text-lg">
-          Navira AI is a real‑time emergency response platform that connects
+          Mediroute AI is a real‑time emergency response platform that connects
           ambulances, hospitals, and traffic infrastructure to reduce response
           time and save lives when every second matters.
         </p>

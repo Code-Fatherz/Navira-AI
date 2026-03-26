@@ -137,7 +137,7 @@ export default function Index() {
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--gradient-hero)' }}>
         <div className="text-center text-primary-foreground">
           <div className="w-14 h-14 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-5" />
-          <p className="text-primary font-medium tracking-wide">Initializing Navira AI…</p>
+          <p className="text-primary font-medium tracking-wide">Initializing MediRoute AI…</p>
         </div>
       </div>
     );
@@ -261,7 +261,7 @@ export default function Index() {
               </span>
             </h2>
             <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
-              Navira AI connects ambulances, hospitals, and traffic systems into one intelligent emergency network.
+              Mediroute AI connects ambulances, hospitals, and traffic systems into one intelligent emergency network.
             </p>
           </div>
 
@@ -374,7 +374,7 @@ export default function Index() {
                 Ready to save more lives?
               </h2>
               <p className="text-muted-foreground max-w-xl mx-auto text-lg">
-                Join hospitals and emergency services already using Navira AI to reduce response times and improve outcomes.
+                Join hospitals and emergency services already using MediRoute AI to reduce response times and improve outcomes.
               </p>
             </div>
           </div>
@@ -385,7 +385,7 @@ export default function Index() {
           <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
             <Logo size="sm" className="!-mt-0" />
             <p className="text-muted-foreground text-sm">
-              © {new Date().getFullYear()} Navira AI. All rights reserved.
+              © {new Date().getFullYear()} MediRoute AI. All rights reserved.
             </p>
 
           </div>

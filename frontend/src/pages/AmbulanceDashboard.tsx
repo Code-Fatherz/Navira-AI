@@ -7,7 +7,7 @@ import { useEmergencyTokens } from '@/hooks/useEmergencyTokens';
 import { useHospitals } from '@/hooks/useHospitals';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, LogOut, Lock } from 'lucide-react';
+import { AlertTriangle, LogOut, Lock, Siren, Activity } from 'lucide-react';
 import MediBot from '@/components/medibot';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -33,26 +33,33 @@ export default function AmbulanceDashboard() {
   const { ambulance, loading: ambLoading, updateLocation, isSimulating, startSimulation, stopSimulation } = useAmbulance();
   const { signals, checkSignalsForAmbulance } = useTrafficSignals();
   const { hospitals } = useHospitals();
-  
-  const { 
-    activeToken, 
+  const [clock, setClock] = useState(new Date());
+
+  const {
+    activeToken,
     createToken,
-    startJourney, 
-    arrivedAtPatient, 
-    startToHospital, 
-    completeEmergency, 
+    startJourney,
+    arrivedAtPatient,
+    startToHospital,
+    completeEmergency,
     cancelEmergency
   } = useEmergencyTokens();
-  
+
   // Feature hooks
   const { emergencyBroadcast, showBroadcast, setShowBroadcast } = useEmergencyBroadcast();
   const { watchId } = useGeolocation(ambulance, activeToken?.status, updateLocation);
-  
+
   // Emergency creation state
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [pickupLocation, setPickupLocation] = useState<PickupLocation | null>(null);
   const [isCreatingToken, setIsCreatingToken] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
+
+  // Live clock
+  useEffect(() => {
+    const t = setInterval(() => setClock(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
 
   // Auth redirect
   useEffect(() => {
@@ -69,19 +76,19 @@ export default function AmbulanceDashboard() {
         .select('is_locked')
         .eq('dashboard_type', 'ambulance')
         .single();
-      
+
       if (data?.is_locked) {
         setIsLocked(true);
       }
     };
-    
+
     checkLock();
-    
+
     const subscription = supabase
       .channel('ambulance_lock')
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
         table: 'dashboard_locks',
         filter: 'dashboard_type=eq.ambulance'
       }, (payload: any) => {
@@ -118,7 +125,7 @@ export default function AmbulanceDashboard() {
 
   const handleLocationSelect = (lat: number, lng: number, address?: string) => {
     setPickupLocation({ lat, lng, address });
-    setShowLocationPicker(false); // Auto-hide map selection after selection
+    setShowLocationPicker(false);
     toast.success('Location selected on map');
   };
 
@@ -205,20 +212,41 @@ export default function AmbulanceDashboard() {
 
   if (authLoading || ambLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center"
+        style={{ background: 'linear-gradient(135deg, #0a0e1a 0%, #0d1525 50%, #0a0e1a 100%)' }}>
+        <div className="text-center space-y-6">
+          <div className="relative mx-auto w-20 h-20">
+            <div className="absolute inset-0 rounded-full border-4 border-red-500/20 border-t-red-500 animate-spin" />
+            <div className="absolute inset-3 rounded-full border-4 border-blue-500/20 border-b-blue-500 animate-spin"
+              style={{ animationDirection: 'reverse', animationDuration: '0.8s' }} />
+            <div className="absolute inset-6 rounded-full bg-red-500/20 animate-pulse" />
+          </div>
+          <div>
+            <p className="text-white font-semibold text-lg tracking-wide">Loading Dashboard</p>
+            <p className="text-slate-400 text-sm mt-1 animate-pulse">Connecting to dispatch...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (isLocked) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <Lock className="w-16 h-16 text-red-500 mx-auto" />
-          <h1 className="text-2xl font-bold">Dashboard Locked</h1>
-          <p className="text-muted-foreground">This dashboard has been locked by an administrator.</p>
-          <Button onClick={signOut}>Sign Out</Button>
+      <div className="min-h-screen flex items-center justify-center"
+        style={{ background: 'linear-gradient(135deg, #0a0e1a 0%, #1a0505 50%, #0a0e1a 100%)' }}>
+        <div className="text-center space-y-6 p-8 rounded-2xl"
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(239,68,68,0.3)', backdropFilter: 'blur(20px)' }}>
+          <div className="w-20 h-20 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto animate-pulse">
+            <Lock className="w-10 h-10 text-red-400" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-white">Dashboard Locked</h1>
+            <p className="text-slate-400 mt-2">This dashboard has been locked by an administrator.</p>
+          </div>
+          <Button onClick={signOut}
+            className="bg-red-600 hover:bg-red-700 text-white px-8">
+            Sign Out
+          </Button>
         </div>
       </div>
     );
@@ -226,7 +254,6 @@ export default function AmbulanceDashboard() {
 
   const hasActiveEmergency = !!activeToken;
 
-  // Get current route based on status
   const getCurrentRoute = () => {
     if (activeToken?.status === 'to_hospital') {
       return activeToken?.route_to_hospital;
@@ -237,7 +264,6 @@ export default function AmbulanceDashboard() {
     return activeToken?.selected_route || null;
   };
 
-  // Build map markers
   const mapMarkers = [
     ...(ambulance ? [{
       position: [ambulance.current_lat, ambulance.current_lng] as [number, number],
@@ -286,7 +312,21 @@ export default function AmbulanceDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen relative overflow-x-hidden"
+      style={{ background: 'linear-gradient(135deg, #070b14 0%, #0d1a2e 40%, #0b1520 70%, #070b14 100%)' }}>
+
+      {/* Animated background orbs */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-10%] left-[-5%] w-96 h-96 rounded-full opacity-10"
+          style={{ background: 'radial-gradient(circle, #ef4444, transparent)', filter: 'blur(60px)', animation: 'pulse 4s ease-in-out infinite' }} />
+        <div className="absolute bottom-[-10%] right-[-5%] w-80 h-80 rounded-full opacity-8"
+          style={{ background: 'radial-gradient(circle, #3b82f6, transparent)', filter: 'blur(80px)', animation: 'pulse 6s ease-in-out infinite alternate' }} />
+        {hasActiveEmergency && (
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-5"
+            style={{ background: 'radial-gradient(circle, #ef4444, transparent)', filter: 'blur(100px)', animation: 'pulse 2s ease-in-out infinite' }} />
+        )}
+      </div>
+
       {/* Emergency Broadcast Alert */}
       {showBroadcast && emergencyBroadcast && (
         <EmergencyBroadcastAlert
@@ -295,36 +335,92 @@ export default function AmbulanceDashboard() {
         />
       )}
 
-      {/* Header */}
-      <nav className={`border-b px-4 py-3 transition-colors ${hasActiveEmergency ? 'bg-emergency/10 border-emergency/30' : 'bg-card border-border'}`}>
-        <div className="container mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <AlertTriangle className={`w-5 h-5 sm:w-6 sm:h-6 ${hasActiveEmergency ? 'text-emergency animate-pulse' : 'text-muted-foreground'}`} />
+      {/* Premium Navbar */}
+      <nav className="relative z-20 sticky top-0"
+        style={{
+          background: hasActiveEmergency
+            ? 'rgba(127,29,29,0.25)'
+            : 'rgba(13,21,37,0.75)',
+          backdropFilter: 'blur(24px)',
+          borderBottom: hasActiveEmergency
+            ? '1px solid rgba(239,68,68,0.4)'
+            : '1px solid rgba(255,255,255,0.07)',
+          boxShadow: hasActiveEmergency
+            ? '0 0 30px rgba(239,68,68,0.15)'
+            : '0 4px 24px rgba(0,0,0,0.4)'
+        }}>
+        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+          {/* Left: Identity */}
+          <div className="flex items-center gap-3">
+            <div className={`relative flex items-center justify-center w-9 h-9 rounded-xl
+              ${hasActiveEmergency ? 'bg-red-500/20' : 'bg-blue-500/10'}
+              border ${hasActiveEmergency ? 'border-red-500/40' : 'border-blue-500/20'}`}>
+              {hasActiveEmergency
+                ? <Siren className="w-5 h-5 text-red-400 animate-pulse" />
+                : <Activity className="w-5 h-5 text-blue-400" />}
+              {hasActiveEmergency && (
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
+              )}
+            </div>
             <div>
-              <span className="font-bold text-sm sm:text-base">Ambulance Dashboard</span>
-              <Badge variant="outline" className="ml-2 text-xs">{ambulance?.vehicle_number}</Badge>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-white text-sm tracking-wide">Ambulance Dashboard</span>
+                {ambulance?.vehicle_number && (
+                  <span className="text-xs px-2 py-0.5 rounded-full font-mono"
+                    style={{ background: 'rgba(59,130,246,0.15)', border: '1px solid rgba(59,130,246,0.3)', color: '#93c5fd' }}>
+                    {ambulance.vehicle_number}
+                  </span>
+                )}
+              </div>
+              {hasActiveEmergency && (
+                <p className="text-xs text-red-400 animate-pulse font-medium mt-0.5">🚨 ACTIVE EMERGENCY IN PROGRESS</p>
+              )}
             </div>
           </div>
-          <div className="flex items-center gap-2 sm:gap-4">
-            <Button variant="outline" size="sm" onClick={() => navigate('/')} className="hidden sm:inline-flex">
-              Dashboard
+
+          {/* Right: User + Clock + Actions */}
+          <div className="flex items-center gap-3">
+            {/* Live Clock */}
+            <div className="hidden md:flex flex-col items-end">
+              <span className="font-mono text-xs text-white/80 tabular-nums">
+                {clock.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+              </span>
+              <span className="text-xs text-slate-500">
+                {clock.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+              </span>
+            </div>
+
+            {/* Driver badge */}
+            {profile?.full_name && (
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg"
+                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                <span className="text-xs text-slate-300 font-medium">{profile.full_name}</span>
+              </div>
+            )}
+
+            <Button variant="ghost" size="sm" onClick={() => navigate('/')}
+              className="text-slate-400 hover:text-white hover:bg-white/10 hidden sm:inline-flex text-xs">
+              Home
             </Button>
-            <span className="text-xs sm:text-sm text-muted-foreground hidden md:block">{profile?.full_name || profile?.email}</span>
-            <Button variant="ghost" size="sm" onClick={signOut}>
+            <Button variant="ghost" size="sm" onClick={signOut}
+              className="text-slate-400 hover:text-red-400 hover:bg-red-500/10">
               <LogOut className="w-4 h-4" />
-              <span className="hidden sm:inline ml-2">Sign Out</span>
+              <span className="hidden sm:inline ml-2 text-xs">Sign Out</span>
             </Button>
           </div>
         </div>
       </nav>
 
-      <div className="container mx-auto p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
-        {/* MediBot AI Assistant */}
+      {/* Main Content */}
+      <div className="relative z-10 container mx-auto p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
+
+        {/* MediBot */}
         <div className="fixed bottom-6 right-6 z-[9999]">
           <MediBot />
         </div>
 
-        {/* Active Emergency Token Display */}
+        {/* Active Emergency Token */}
         {hasActiveEmergency && (
           <EmergencyTokenDisplay
             activeToken={activeToken}
@@ -351,7 +447,7 @@ export default function AmbulanceDashboard() {
           />
         )}
 
-        {/* Location & Status */}
+        {/* Status grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           <div className="space-y-4">
             <AmbulanceStatus
