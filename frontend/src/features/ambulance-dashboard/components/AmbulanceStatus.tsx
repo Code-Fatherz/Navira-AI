@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { MapPin, Navigation, Gauge, Wifi } from 'lucide-react';
+import { MapPin, Wifi } from 'lucide-react';
 import { Ambulance } from '../types';
 import { toast } from 'sonner';
 import { SimulationModal } from '@/components/SimulationModal';
@@ -42,12 +42,6 @@ export const AmbulanceStatus: React.FC<AmbulanceStatusProps> = ({
     }
   };
 
-  const speed = ambulance?.speed ?? 0;
-  const heading = ambulance?.heading ?? 0;
-  // Arc gauge: 180° sweep, speed max 120 km/h
-  const speedPct = Math.min(speed / 120, 1);
-  const speedAngle = speedPct * 180 - 90; // -90 to 90 degrees
-
   return (
     <div className="rounded-2xl p-5 space-y-5"
       style={{
@@ -72,54 +66,6 @@ export const AmbulanceStatus: React.FC<AmbulanceStatusProps> = ({
           <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
           <Wifi className="w-3 h-3 text-green-400" />
           <span className="text-xs font-medium text-green-400">ONLINE</span>
-        </div>
-      </div>
-
-      {/* Speed Gauge + Compass row */}
-      <div className="grid grid-cols-2 gap-4">
-        {/* Speed Arc Gauge */}
-        <div className="flex flex-col items-center gap-1">
-          <div className="relative w-28 h-16 overflow-hidden">
-            {/* Track arc */}
-            <svg viewBox="0 0 100 55" className="w-full h-full">
-              <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" strokeLinecap="round" />
-              <path
-                d="M 10 50 A 40 40 0 0 1 90 50"
-                fill="none"
-                stroke={speed > 80 ? '#ef4444' : speed > 50 ? '#f59e0b' : '#22c55e'}
-                strokeWidth="8"
-                strokeLinecap="round"
-                strokeDasharray={`${speedPct * 125.66} 125.66`}
-                style={{ transition: 'stroke-dasharray 0.5s ease, stroke 0.5s ease' }}
-              />
-            </svg>
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-center">
-              <span className="text-xl font-bold text-white tabular-nums">{speed.toFixed(0)}</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-1">
-            <Gauge className="w-3 h-3 text-slate-400" />
-            <span className="text-xs text-slate-400">km/h</span>
-          </div>
-        </div>
-
-        {/* Compass */}
-        <div className="flex flex-col items-center gap-1">
-          <div className="relative w-16 h-16 rounded-full flex items-center justify-center"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '2px solid rgba(255,255,255,0.1)' }}>
-            {/* Cardinal labels */}
-            <span className="absolute top-1 text-[9px] text-slate-500 font-bold">N</span>
-            <span className="absolute bottom-1 text-[9px] text-slate-500 font-bold">S</span>
-            <span className="absolute left-1 text-[9px] text-slate-500 font-bold">W</span>
-            <span className="absolute right-1 text-[9px] text-slate-500 font-bold">E</span>
-            {/* Arrow */}
-            <div className="w-0 h-0 border-l-[4px] border-r-[4px] border-b-[20px] border-l-transparent border-r-transparent border-b-red-400"
-              style={{ transform: `rotate(${heading}deg)`, transition: 'transform 0.5s ease' }} />
-          </div>
-          <div className="flex items-center gap-1">
-            <Navigation className="w-3 h-3 text-slate-400" />
-            <span className="text-xs text-slate-400">{heading.toFixed(0)}°</span>
-          </div>
         </div>
       </div>
 
