@@ -37,11 +37,18 @@ class CityGraph {
             resolve({ intersections: this.intersections, roadSegments: this.roadSegments });
           } catch (e) {
             console.error('[CityGraph] OSM Parse Error:', e);
-            reject(e);
+            console.log('[CityGraph] Falling back to backup map data...');
+            this.buildFallbackGraph();
+            resolve({ intersections: this.intersections, roadSegments: this.roadSegments });
           }
         });
       });
-      req.on('error', reject);
+      req.on('error', (err) => {
+        console.error('[CityGraph] Network Error:', err);
+        console.log('[CityGraph] Falling back to backup map data...');
+        this.buildFallbackGraph();
+        resolve({ intersections: this.intersections, roadSegments: this.roadSegments });
+      });
       req.write('data=' + encodeURIComponent(query));
       req.end();
     });
@@ -131,6 +138,72 @@ class CityGraph {
 
     let bearing = Math.atan2(y, x) * 180 / Math.PI;
     return (bearing + 360) % 360; // 0 to 360
+  }
+
+  buildFallbackGraph() {
+    const MAJOR_ROADS_FALLBACK = [
+      { id: 'FR1', points: [[30.7626, 76.7766], [30.7483, 76.7905], [30.7380, 76.8020], [30.7258, 76.8055], [30.7100, 76.8210]], name: 'Madhya Marg' },
+      { id: 'FR2', points: [[30.7100, 76.7400], [30.7150, 76.7500], [30.7315, 76.7620], [30.7188, 76.7958], [30.7050, 76.8100]], name: 'Dakshin Marg' },
+      { id: 'FR3', points: [[30.7600, 76.7950], [30.7483, 76.7905], [30.7380, 76.7820], [30.7315, 76.7620], [30.7200, 76.7500]], name: 'Jan Marg' },
+      { id: 'FR4', points: [[30.7450, 76.7750], [30.7380, 76.7820], [30.7320, 76.7840], [30.7258, 76.8055]], name: 'Udyog Path' },
+      { id: 'FR5', points: [[30.7550, 76.8000], [30.7320, 76.7840], [30.7200, 76.7750], [30.7100, 76.7650]], name: 'Himalaya Marg' },
+      { id: 'FR6', points: [[30.7258, 76.8055], [30.7188, 76.7958], [30.7050, 76.7850]], name: 'Purv Marg' },
+      { id: 'FR7', points: [[30.7150, 76.7500], [30.7050, 76.7650], [30.6950, 76.7800], [30.7188, 76.7958]], name: 'Vikas Marg' },
+      { id: 'FR8', points: [[30.7600, 76.7500], [30.7400, 76.7500], [30.7200, 76.7500]], name: 'V Vidya Path' }
+    ];
+
+    this.roadSegments = [];
+    this.intersections = [];
+    let sigId = 1;
+
+    MAJOR_ROADS_FALLBACK.forEach(road => {
+      for (let i = 0; i < road.points.length - 1; i++) {
+        const start = { lat: road.points[i][0], lng: road.points[i][1] };
+        const end = { lat: road.points[i+1][0], lng: road.points[i+1][1] };
+        
+        this.roadSegments.push({
+          id: `${road.id}-${i}`,
+          name: road.name,
+          start: start,
+          end: end,
+          coords: [start, end],
+          vehicles: Math.floor(Math.random() * 40) + 10
+        });
+
+        // Add intersections at points
+        if (i > 0 && i < road.points.length - 1) {
+          const pt = road.points[i];
+          this.intersections.push({
+            intersection_id: `SIG-F${sigId++}`,
+            latitude: pt[0],
+            longitude: pt[1],
+            connected_roads: 4,
+            roads: [
+              { id: 1, bearing: 0 },
+              { id: 2, bearing: 90 },
+              { id: 3, bearing: 180 },
+              { id: 4, bearing: 270 }
+            ],
+            traffic_density: Math.floor(Math.random() * 70) + 10,
+            current_phase: 1,
+            signal_state: 'RED',
+            green_duration: 30
+          });
+        }
+      }
+    });
+
+    const uniqueInts = [];
+    const seenMap = new Set();
+    this.intersections.forEach(i => {
+      const key = `${i.latitude.toFixed(4)},${i.longitude.toFixed(4)}`;
+      if (!seenMap.has(key)) {
+        seenMap.add(key);
+        uniqueInts.push(i);
+      }
+    });
+    this.intersections = uniqueInts;
+    console.log(`[CityGraph] Fallback graph generated with ${this.intersections.length} intersections and ${this.roadSegments.length} road segments.`);
   }
 }
 
