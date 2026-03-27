@@ -70,13 +70,7 @@ const createCustomIcon = (type: 'ambulance' | 'signal' | 'hospital', highlighted
         font-size: 9px;
         font-weight: bold;
         white-space: nowrap;
-      ">Ambulance</div>
-      <style>
-        @keyframes pulse {
-          0%, 100% { transform: scale(1); opacity: 1; }
-          50% { transform: scale(1.15); opacity: 0.9; }
-        }
-      </style>`,
+      ">Ambulance</div>`,
       iconSize: [size, size + 8],
       iconAnchor: [size / 2, size / 2],
       popupAnchor: [0, -size / 2],
@@ -111,13 +105,7 @@ const createCustomIcon = (type: 'ambulance' | 'signal' | 'hospital', highlighted
         font-size: 9px;
         font-weight: bold;
         white-space: nowrap;
-      ">Hospital</div>
-      <style>
-        @keyframes pulse {
-          0%, 100% { transform: scale(1); opacity: 1; }
-          50% { transform: scale(1.15); opacity: 0.9; }
-        }
-      </style>`,
+      ">Hospital</div>`,
       iconSize: [size, size + 8],
       iconAnchor: [size / 2, size / 2],
       popupAnchor: [0, -size / 2],
@@ -134,13 +122,7 @@ const createCustomIcon = (type: 'ambulance' | 'signal' | 'hospital', highlighted
       border: ${border};
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
       ${highlighted ? 'animation: pulse 1.5s ease-in-out infinite;' : ''}
-    "></div>
-    <style>
-      @keyframes pulse {
-        0%, 100% { transform: scale(1); opacity: 1; }
-        50% { transform: scale(1.15); opacity: 0.9; }
-      }
-    </style>`,
+    "></div>`,
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2],
     popupAnchor: [0, -size / 2],
@@ -192,14 +174,7 @@ export default function Map({
           border-radius: 50%;
           box-shadow: 0 2px 8px rgba(0,0,0,0.3);
           animation: pulse 2s infinite;
-        "></div>
-        <style>
-          @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.2); opacity: 0.7; }
-            100% { transform: scale(1); opacity: 1; }
-          }
-        </style>`,
+        "></div>`,
         iconSize: [20, 20],
         iconAnchor: [10, 10]
       });
@@ -232,7 +207,15 @@ export default function Map({
     if (!mapContainer.current || mapRef.current) return;
 
     // Initialize map with validated center
-    mapRef.current = L.map(mapContainer.current).setView(safeCenter, zoom);
+    mapRef.current = L.map(mapContainer.current, { preferCanvas: true }).setView(safeCenter, zoom);
+
+    // Inject pulse keyframe once
+    if (!document.getElementById('leaflet-pulse-style')) {
+      const style = document.createElement('style');
+      style.id = 'leaflet-pulse-style';
+      style.textContent = '@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:0.9}}';
+      document.head.appendChild(style);
+    }
 
     // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -273,14 +256,7 @@ export default function Map({
             font-size: 10px;
             font-weight: bold;
             white-space: nowrap;
-          ">📍 Patient</div>
-          <style>
-            @keyframes drop {
-              0% { transform: rotate(-45deg) translateY(-50px); opacity: 0; }
-              50% { transform: rotate(-45deg) translateY(5px); }
-              100% { transform: rotate(-45deg) translateY(0); opacity: 1; }
-            }
-          </style>`,
+          ">📍 Patient</div>`,
           iconSize: [30, 30],
           iconAnchor: [15, 30]
         });

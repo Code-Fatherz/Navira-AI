@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useAmbulance } from '@/hooks/useAmbulance';
@@ -27,13 +27,30 @@ import { useEmergencyBroadcast } from '../features/ambulance-dashboard/hooks/use
 // Types
 import { PickupLocation, EmergencyType } from '../features/ambulance-dashboard/types';
 
+const LiveClock = React.memo(() => {
+  const [clock, setClock] = useState(new Date());
+  useEffect(() => {
+    const t = setInterval(() => setClock(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
+  return (
+    <div className="hidden md:flex flex-col items-end">
+      <span className="font-mono text-xs text-white/80 tabular-nums">
+        {clock.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+      </span>
+      <span className="text-xs text-slate-500">
+        {clock.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+      </span>
+    </div>
+  );
+});
+
 export default function AmbulanceDashboard() {
   const navigate = useNavigate();
   const { user, profile, loading: authLoading, signOut } = useAuth();
   const { ambulance, loading: ambLoading, updateLocation, isSimulating, startSimulation, stopSimulation } = useAmbulance();
   const { signals, checkSignalsForAmbulance } = useTrafficSignals();
   const { hospitals } = useHospitals();
-  const [clock, setClock] = useState(new Date());
 
   const {
     activeToken,
@@ -54,12 +71,6 @@ export default function AmbulanceDashboard() {
   const [pickupLocation, setPickupLocation] = useState<PickupLocation | null>(null);
   const [isCreatingToken, setIsCreatingToken] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
-
-  // Live clock
-  useEffect(() => {
-    const t = setInterval(() => setClock(new Date()), 1000);
-    return () => clearInterval(t);
-  }, []);
 
   // Auth redirect
   useEffect(() => {
@@ -383,14 +394,7 @@ export default function AmbulanceDashboard() {
           {/* Right: User + Clock + Actions */}
           <div className="flex items-center gap-3">
             {/* Live Clock */}
-            <div className="hidden md:flex flex-col items-end">
-              <span className="font-mono text-xs text-white/80 tabular-nums">
-                {clock.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-              </span>
-              <span className="text-xs text-slate-500">
-                {clock.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
-              </span>
-            </div>
+            <LiveClock />
 
             {/* Driver badge */}
             {profile?.full_name && (

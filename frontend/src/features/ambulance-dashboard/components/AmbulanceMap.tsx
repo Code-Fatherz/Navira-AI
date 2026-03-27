@@ -19,7 +19,7 @@ interface AmbulanceMapProps {
   onLocationUpdate: (lat: number, lng: number) => void;
 }
 
-export const AmbulanceMap: React.FC<AmbulanceMapProps> = ({
+export const AmbulanceMap: React.FC<AmbulanceMapProps> = React.memo(({
   ambulance,
   showLocationPicker,
   pickupLocation,
@@ -74,4 +74,4 @@ export const AmbulanceMap: React.FC<AmbulanceMapProps> = ({
       </CardContent>
     </Card>
   );
-};
+});
