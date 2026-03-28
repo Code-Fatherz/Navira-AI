@@ -26,15 +26,31 @@ class TrafficAI {
         
         // Dynamic inputs for AI optimization
         // In a full sim, we'd query exact queue lengths and arrival rates.
-        // For our demo, we approximate waiting time using density as an analog for queue length.
+        // For our demo, we use traffic_density as queue length indicator
         const vehicle_count = sig.traffic_density;
-        const waiting_time = Math.max(0, vehicle_count - 10) * 1.5; // Simulate longer wait for denser queues
         
-        // AI Formula: green_time = base_time + (vehicle_count * 0.5) + (waiting_time * 0.3)
-        let newGreenTime = this.baseGreenTime + (vehicle_count * 0.5) + (waiting_time * 0.3);
+        // Calculate arrival rate (vehicles arriving per second)
+        const arrivalRate = Math.max(0.5, vehicle_count / 30); // Assume 30s cycle reference
+        
+        // Calculate saturation flow (vehicles that can pass through per second at green)
+        // Typical saturation flow: ~1.8 vehicles per second per lane, assume 1 effective lane
+        const saturationFlow = 1.8;
+        
+        // Time required to clear vehicle queue (time = queue / saturation_flow)
+        const queueClearanceTime = vehicle_count / saturationFlow;
+        
+        // Time needed to handle arriving vehicles during green phase
+        const arrivalHandlingTime = arrivalRate * this.baseGreenTime;
+        
+        // Total volume-time product: vehicles_queued + vehicles_arriving_during_green
+        const totalVolumeToProcess = vehicle_count + (arrivalRate * this.baseGreenTime);
+        
+        // Green time based on volume-time relationship: time = volume / saturation_flow
+        // With minimum base green time and safety margin (1.2x) for stochastic demand
+        let newGreenTime = Math.ceil((totalVolumeToProcess / saturationFlow) * 1.2);
         
         // Cap durations to prevent infinite starvation of perpendicular traffic
-        newGreenTime = Math.min(60, Math.max(this.baseGreenTime, Math.round(newGreenTime)));
+        newGreenTime = Math.min(60, Math.max(this.baseGreenTime, newGreenTime));
         
         if (newGreenTime !== oldGreen) {
           signalController.updateGreenTime(sig.intersection_id, newGreenTime);
